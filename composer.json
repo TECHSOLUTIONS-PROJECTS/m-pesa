@@ -1,6 +1,7 @@
 {
   "name": "techsolutions/m-pesa",
   "description": "MPesa package for laravel",
+  "license": "MIT",
   "keywords": [
     "techsolutions",
     "mpesa"
