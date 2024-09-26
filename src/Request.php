@@ -268,7 +268,7 @@ class Request implements MPesaContract
      */
     protected function productionRequest(string $port = ''): Client
     {
-        return new Client(['base_uri' => $this->host . ':' . $port]);
+        return new Client(['base_uri' => 'https://' . $this->host . ':' . $port]);
     }
 
     /**

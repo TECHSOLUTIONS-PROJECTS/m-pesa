@@ -14,11 +14,11 @@ class Parser implements ParserContract
      * @param string $privateKey
      * @return string
      */
-    public static function parse(string $publicKey, string $privateKey): string
+    public static function parse(string $api_key, string $public_key): string
     {
-        $key = self::keysToCertificate($publicKey);
-        $publicKey = openssl_get_publickey($key);
-        openssl_public_encrypt($privateKey, $token, $publicKey, OPENSSL_PKCS1_PADDING);
+        $key = self::keysToCertificate($public_key);
+        $public_key = openssl_get_publickey($key);
+        openssl_public_encrypt($api_key, $token, $public_key, OPENSSL_PKCS1_PADDING);
         return base64_encode($token);
     }
 

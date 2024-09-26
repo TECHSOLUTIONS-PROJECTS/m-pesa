@@ -5,30 +5,15 @@ namespace Techsolutions\MPesa;
 use Techsolutions\MPesa\Contracts\FakeContract;
 use Techsolutions\MPesa\Contracts\MPesaContract;
 use Techsolutions\MPesa\Contracts\MPesaStaticContract;
-use Techsolutions\MPesa\Exceptions\InvalidEnvironmentException;
 use Techsolutions\MPesa\Helpers\Parser;
+use Techsolutions\MPesa\Config\Config;
 
-class MPesa implements MPesaStaticContract, FakeContract
+class MPesa extends Config implements MPesaStaticContract, FakeContract
 {
     /**
      * @var bool $test
      */
     protected static bool $fake = false;
-
-    /**
-     * @var string $developmentHost
-     */
-    protected static string $developmentHost = "https://api.sandbox.vm.co.mz";
-
-    /**
-     * @var string $productionHost
-     */
-    protected static string $productionHost = "https://api.vm.co.mz";
-
-    /**
-     * @var string
-     */
-    protected static string $origin = "developer.mpesa.vm.co.mz";
 
     /**
      * @var string
@@ -137,14 +122,10 @@ class MPesa implements MPesaStaticContract, FakeContract
     /**
      * @return MPesaContract
      */
-    protected function mPesa(): MPesaContract
+    protected function mPesa()
     {
-        $host = config('mpesa.environment') == 'production' ? self::$productionHost : self::$developmentHost;
-        $token = Parser::parse(config('mpesa.public_key'), config('mpesa.private_key'));
-        $providerCode = config('mpesa.service_provider_code');
-        $identifier = config('mpesa.initiator_identifier');
-        $credential = config('mpesa.security_credential');
-        $mpesaRequest = new Request($host, self::$origin, $token, $providerCode, $identifier, $credential);
-        return $mpesaRequest->setFake(self::$fake, self::$responseCode, self::$status);
+        $token = Parser::parse(self::getApiKey(), self::getPublicKey());
+        $request = new Request(self::getHost(), self::getOrigin(), $token, self::getServiceProviderCode(), self::getInitiatorIdentifier(), self::getSecurityCredential());
+        return $request->setFake(self::$fake, self::$responseCode, self::$status);
     }
 }
