@@ -23,14 +23,6 @@ interface MPesaContract
         string $securityCredential);
 
     /**
-     * @param bool $fake
-     * @param int $code
-     * @param string $status
-     * @return MPesaContract
-     */
-    public function setFake(bool $fake, int $code, string $status): MPesaContract;
-
-    /**
      * Initiates a customer to business (c2b) transaction on the M-Pesa API.
      *
      * @param float $amount

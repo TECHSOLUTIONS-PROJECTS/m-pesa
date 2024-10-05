@@ -12,7 +12,6 @@ use JsonSerializable;
  * @property string $responseCode
  * @property string $transactionID
  * @property string $conversationID
- * @property string $transactionStatus
  * @property string $thirdPartyReference
  * @property string $responseDescription
  */
@@ -43,16 +42,6 @@ class Transaction implements TransactionContract, Arrayable, Jsonable, JsonSeria
     public function getResponseCode(): string
     {
         return $this->responseCode;
-    }
-
-    /**
-     * Get transaction status.
-     *
-     * @return string
-     */
-    public function getTransactionStatus(): string
-    {
-        return $this->transactionStatus;
     }
 
     /**
@@ -112,8 +101,7 @@ class Transaction implements TransactionContract, Arrayable, Jsonable, JsonSeria
             'transactionID' => $this->attributes['output_TransactionID'] ?? null,
             'conversationID' => $this->attributes['output_ConversationID'] ?? null,
             'responseDescription' => $this->attributes['output_ResponseDesc'] ?? null,
-            "thirdPartyReference" => $this->attributes["output_ThirdPartyReference" ] ?? null,
-            'transactionStatus' => $this->attributes['output_ResponseTransactionStatus'] ?? null,
+            'thirdPartyReference' => $this->attributes["output_ThirdPartyReference" ] ?? null,
         ];
     }
 

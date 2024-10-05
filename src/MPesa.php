@@ -126,6 +126,6 @@ class MPesa extends Config implements MPesaStaticContract, FakeContract
     {
         $token = Parser::parse(self::getApiKey(), self::getPublicKey());
         $request = new Request(self::getHost(), self::getOrigin(), $token, self::getServiceProviderCode(), self::getInitiatorIdentifier(), self::getSecurityCredential());
-        return $request->setFake(self::$fake, self::$responseCode, self::$status);
+        return $request;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Techsolutions\MPesa;
 
+use GuzzleHttp\Exception\ClientException;
 use Techsolutions\MPesa\Contracts\MPesaContract;
 use Exception;
 use GuzzleHttp\Client;
@@ -43,21 +44,6 @@ class Request implements MPesaContract
      */
     protected string $securityCredential;
 
-    /**
-     * @var bool $fake
-     */
-    protected bool $fake;
-
-    /**
-     * @var int $code
-     */
-    protected int $responseCode;
-
-    /**
-     * @var string $status
-     */
-    protected string $responseStatus;
-
     public function __construct(
         string $host,
         string $origin,
@@ -72,20 +58,6 @@ class Request implements MPesaContract
         $this->serviceProviderCode = $serviceProviderCode;
         $this->initiatorIdentifier = $initiatorIdentifier;
         $this->securityCredential = $securityCredential;
-    }
-
-    /**
-     * @param bool $fake
-     * @param int $code
-     * @param string $status
-     * @return MPesaContract
-     */
-    public function setFake(bool $fake, int $code, string $status): MPesaContract
-    {
-        $this->fake = $fake;
-        $this->responseCode = $code;
-        $this->responseStatus = $status;
-        return $this;
     }
 
     /**
@@ -116,7 +88,11 @@ class Request implements MPesaContract
             'Authorization' => 'Bearer ' . $this->token,
         ], json_encode($data));
 
-        $response = $client->send($request);
+        try {
+            $response = $client->send($request);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+        }
 
         return new Transaction($this->streamToArray($response->getBody()));
     }
@@ -149,7 +125,11 @@ class Request implements MPesaContract
             'Authorization' => 'Bearer ' . $this->token,
         ], json_encode($data));
 
-        $response = $client->send($request);
+        try {
+            $response = $client->send($request);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+        }
 
         return new Transaction($this->streamToArray($response->getBody()));
     }
@@ -182,7 +162,11 @@ class Request implements MPesaContract
             'Authorization' => 'Bearer ' . $this->token,
         ], json_encode($data));
 
-        $response = $client->send($request);
+        try {
+            $response = $client->send($request);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+        }
 
         return new Transaction($this->streamToArray($response->getBody()));
     }
@@ -215,7 +199,11 @@ class Request implements MPesaContract
             'Authorization' => 'Bearer ' . $this->token,
         ], json_encode($data));
 
-        $response = $client->send($request);
+        try {
+            $response = $client->send($request);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+        }
 
         return new Transaction($this->streamToArray($response->getBody()));
     }
@@ -244,7 +232,11 @@ class Request implements MPesaContract
             'Authorization' => 'Bearer ' . $this->token
         ]);
 
-        $response = $client->send($request);
+        try {
+            $response = $client->send($request);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+        }
 
         return new Transaction($this->streamToArray($response->getBody()));
     }
@@ -257,56 +249,9 @@ class Request implements MPesaContract
      * @return Client
      * @throws Exception
      */
-    protected function request(string $port = '' ,array $body = []): Client
-    {
-        return $this->fake ? $this->developmentRequest($body) : $this->productionRequest($port);
-    }
-
-    /**
-     * @param string $port
-     * @return Client
-     */
-    protected function productionRequest(string $port = ''): Client
+    protected function request(string $port = ''): Client
     {
         return new Client(['base_uri' => 'https://' . $this->host . ':' . $port]);
-    }
-
-    /**
-     * @param array $data
-     * @return Client
-     * @throws Exception
-     */
-    protected function developmentRequest(array $data): Client
-    {
-        $mock = new MockHandler([
-            new Response($this->responseCode, [
-                'Content-Type' => 'application/json',
-                'origin' => $this->origin
-            ], $this->testResponseBody($data))
-        ]);
-        return new Client(['handler' => HandlerStack::create($mock)]);
-    }
-
-    /**
-     * @param array $data
-     * @return string
-     * @throws Exception
-     */
-    protected function testResponseBody(array $data): string
-    {
-        $response = [
-            'output_ResponseCode' => $this->responseCode,
-            'output_ResponseDesc' => 'Successfully Accepted Request',
-            'output_TransactionID' => bin2hex(random_bytes(16)),
-            'output_ConversationID' => bin2hex(random_bytes(16)),
-            'output_ThirdPartyReference' => $data['input_ThirdPartyReference'] ?? null,
-        ];
-
-        $response = !isset($data['input_QueryReference']) && empty($this->responseStatus)  ? $response : array_merge($response, [
-            'output_ResponseTransactionStatus' => empty($this->responseStatus) ? 'Completed' : $this->responseStatus,
-        ]);
-
-        return json_encode($response);
     }
 
     /**

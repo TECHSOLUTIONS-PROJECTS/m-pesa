@@ -18,12 +18,6 @@ interface TransactionContract
      */
     public function getResponseCode(): string;
 
-    /**
-     * Get transaction status.
-     *
-     * @return string
-     */
-    public function getTransactionStatus(): string;
 
     /**
      * Get transaction id.
